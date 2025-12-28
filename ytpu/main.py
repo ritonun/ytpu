@@ -3,7 +3,7 @@
 import sys
 import os
 import logging
-
+from pathlib import Path
 from pathvalidate import sanitize_filename
 
 import ytpu.downloader as dl
@@ -11,7 +11,12 @@ from ytpu.file_io import load_json, write_json  # noqa: F401
 
 
 EXT = ".m4a"
-LOG_FILE = "ytpu.log"
+APP_NAME = "ytpu"
+DATA_DIR = (
+    Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share")) / APP_NAME
+)
+LOG_FILE = DATA_DIR / "ytpu.log"
+TEMP_JSON = DATA_DIR / "temp.json"
 
 
 def setup_logging():
@@ -22,6 +27,10 @@ def setup_logging():
         datefmt="%Y-%m-%d %H:%M:%S",  # date format
         level=logging.INFO,  # default logging level
     )
+
+
+def init_app():
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def validate_url(url: str):
@@ -103,6 +112,8 @@ def remove_local_videos(local_videos: list, remote_videos: list) -> list[dict]:
 def main():
     print("Welcome to ytpu")
 
+    init_app()
+
     # parse args input
     args = get_args()
     print(f"INPUT URL: {args['url']}\nINPUT OUTPUT_PATH: {args['output_folder']}")
@@ -113,7 +124,7 @@ def main():
 
     # get videos from playlist
     data = dl.get_playlist_info(args["url"])
-    write_json("temp.json", data, mode="w")
+    write_json(TEMP_JSON, data, mode="w")
 
     remote_videos = extract_video_from_playlist(data)
     print(f"Found {len(remote_videos)} videos in playlist")
