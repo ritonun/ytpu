@@ -54,9 +54,18 @@ def get_args():
 def get_local_videos(folder_path):
     files = os.listdir(folder_path)
     all_files = []
+
     for file in files:
-        if os.path.isfile(os.path.join(folder_path, file)):
-            all_files.append(file.replace(EXT, ""))
+        file = str(file)
+        # check is not folder
+        if not os.path.isfile(os.path.join(folder_path, file)):
+            continue
+
+        # check file is fully download
+        if not file.endswith(EXT):
+            continue
+
+        all_files.append(file.replace(EXT, ""))
     return all_files
 
 
