@@ -1,5 +1,9 @@
+# main.py
+
 import sys
 import os
+import ytpu.downloader as dl
+from ytpu.file_io import write_json, load_json
 
 
 def validate_url(url: str):
@@ -29,7 +33,27 @@ def get_args():
     return args
 
 
+def get_local_videos(folder_path):
+    files = os.listdir(folder_path)
+    all_files = []
+    for file in files:
+        if os.path.isfile(os.path.join(folder_path, file)):
+            all_files.append(file)
+    return all_files
+
+
 def main():
-    print("hello")
+    print("Welcome to ytpu")
+
+    # parse args input
     args = get_args()
-    print(args)
+    print(f"INPUT URL: {args['url']}\nINPUT OUTPUT_PATH: {args['output_folder']}")
+
+    # find local videos
+    local_videos = get_local_videos(args["output_folder"])
+    print(f"Found {len(local_videos)} local videos")
+
+    # get videos from playlist
+    # data = dl.get_playlist_info(args["url"])
+    # write_json("temp.json", data, mode="w")
+    data = load_json("temp.json")
