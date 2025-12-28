@@ -2,8 +2,14 @@
 
 import sys
 import os
+
+from pathvalidate import sanitize_filename
+
 import ytpu.downloader as dl
 from ytpu.file_io import write_json, load_json
+
+
+EXT = ".m4a"
 
 
 def validate_url(url: str):
@@ -38,8 +44,39 @@ def get_local_videos(folder_path):
     all_files = []
     for file in files:
         if os.path.isfile(os.path.join(folder_path, file)):
-            all_files.append(file)
+            all_files.append(file.replace(EXT, ""))
     return all_files
+
+
+def extract_video_from_playlist(data: dict) -> list:
+    if "entries" not in data:
+        raise KeyError("'entries' not in JSON result.")
+
+    videos = []
+    for entry in data["entries"]:
+        if "url" not in entry:
+            print("WARNING: 'url' not in JSON entry.")
+            continue
+        if "title" not in entry:
+            print("WARNING: 'title' not in JSON entry")
+            continue
+        url = entry["url"]
+        title = sanitize_filename(entry["title"])
+        videos.append({"url": url, "title": title})
+    return videos
+
+
+def remove_local_videos(local_videos: list, remote_videos: list) -> list[dict]:
+    videos_to_dl = []
+    for rv in remote_videos:
+        match = False
+        for lv in local_videos:
+            if lv == rv["title"]:
+                match = True
+                break
+        if not match:
+            videos_to_dl.append(rv)
+    return videos_to_dl
 
 
 def main():
@@ -51,9 +88,17 @@ def main():
 
     # find local videos
     local_videos = get_local_videos(args["output_folder"])
-    print(f"Found {len(local_videos)} local videos")
+    print(f"Found {len(local_videos)} videos in local folder")
 
     # get videos from playlist
     # data = dl.get_playlist_info(args["url"])
     # write_json("temp.json", data, mode="w")
     data = load_json("temp.json")
+
+    remote_videos = extract_video_from_playlist(data)
+    print(f"Found {len(remote_videos)} videos in playlist")
+
+    videos_to_dl = remove_local_videos(local_videos, remote_videos)
+    print(f"Found {len(videos_to_dl)} videos in playlist not already downloaded")
+
+    dl.download_videos(videos_to_dl, args)
