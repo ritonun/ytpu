@@ -45,7 +45,16 @@ def validate_path(path: str):
 def get_args():
     args = {"output_folder": ".", "url": ""}
     if len(sys.argv) == 2:
-        args["url"] = sys.argv[1]
+        if sys.argv[1] == "-v" or sys.argv[1] == "--version":
+            from importlib.metadata import version
+
+            print(version(APP_NAME))
+
+        elif sys.argv[1] == "-h" or sys.argv[1] == "--help":
+            print("ytpu -o [OUTPUT_FOLDER] [URL]")
+            print("ytpu [URL]")
+        else:
+            args["url"] = sys.argv[1]
     elif len(sys.argv) == 4:
         if sys.argv[1] == "-o":
             args["output_folder"] = sys.argv[2]
