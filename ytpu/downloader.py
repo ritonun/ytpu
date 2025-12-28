@@ -3,6 +3,7 @@
 import subprocess
 import json
 import os
+import logging
 
 from tqdm import tqdm
 
@@ -34,11 +35,12 @@ def download_videos(videos: list[dict], args: dict):
             video["url"],
         ]
 
-        print(f"CMD: ' '.join({cmd})", end="")
+        logging.info(f"CMD: ' '.join({cmd})")
+
         result = subprocess.run(
             cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         if result.returncode != 0:
-            print(".. FAIL")
+            logging.info("FAIL")
         else:
-            print(".. OK")
+            logging.info("OK")

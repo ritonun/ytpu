@@ -2,14 +2,26 @@
 
 import sys
 import os
+import logging
 
 from pathvalidate import sanitize_filename
 
 import ytpu.downloader as dl
-from ytpu.file_io import write_json, load_json
+from ytpu.file_io import load_json, write_json  # noqa: F401
 
 
 EXT = ".m4a"
+LOG_FILE = "ytpu.log"
+
+
+def setup_logging():
+    logging.basicConfig(
+        filename=LOG_FILE,  # log to a file
+        filemode="a",  # append mode
+        format="%(asctime)s - %(levelname)s - %(message)s",  # simple format
+        datefmt="%Y-%m-%d %H:%M:%S",  # date format
+        level=logging.INFO,  # default logging level
+    )
 
 
 def validate_url(url: str):
@@ -91,9 +103,8 @@ def main():
     print(f"Found {len(local_videos)} videos in local folder")
 
     # get videos from playlist
-    # data = dl.get_playlist_info(args["url"])
-    # write_json("temp.json", data, mode="w")
-    data = load_json("temp.json")
+    data = dl.get_playlist_info(args["url"])
+    write_json("temp.json", data, mode="w")
 
     remote_videos = extract_video_from_playlist(data)
     print(f"Found {len(remote_videos)} videos in playlist")
