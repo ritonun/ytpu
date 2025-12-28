@@ -1,6 +1,6 @@
 # YT-PU
 
-Wrapper around yt-dlp to download audio from a public youtube playlist
+Wrapper around yt-dlp to download audio from a public YouTube playlist
 
 ## Install
 ### Dependencies
@@ -8,19 +8,19 @@ Wrapper around yt-dlp to download audio from a public youtube playlist
 
 ### Install yt-pu
 ```bash
-pip install yt-pu
+pip install ytpu
 ```
 It is recommended to use a dedicated virtual environment:
 ```bash
-pipx install yt-pu
+pipx install ytpu
 ```
 
 ## Usage
 ```bash
-yt-pu URL
+ytpu URL
 ```
 
 Specify an output path (recommended):
 ```bash
-yt-pu -o OUTPUT_FOLDER URL
+ytpu -o OUTPUT_FOLDER URL
 ```
